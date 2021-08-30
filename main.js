@@ -22,8 +22,6 @@ class Event {
     }
 }
 
-events = []; 
-
 client.commands = new Discord.Collection(); 
 
 const commandFolders = fs.readdirSync("./commands"); 
@@ -33,7 +31,7 @@ for (const folder of commandFolders) {
     const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith(".js")); // fetches in js file in the commands folder
     for (const file of commandFiles) {
         const command = require(`./commands/${folder}/${file}`); 
-        client.commands.set(command.name, command); 
+        client.commands.set(command.name, command);  
     }
 }
 
@@ -60,6 +58,10 @@ const rest = new REST({ version: "9" }).setToken(token);
 // configuring slash command responses 
 client.on("interactionCreate", async interaction => {
     if (!interaction.isCommand()) return; 
+
+    if (interaction.commandName == "addevent") {
+        await interaction.reply({ content: "Event added to calendar!", ephemeral: true });  
+    }
 })
 
 client.login(token); 
