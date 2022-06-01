@@ -1,67 +1,36 @@
-const Discord = require("discord.js"); 
+const { Collection, Client, Intents } = require("discord.js"); 
 const { REST } = require("@discordjs/rest"); 
 const { Routes } = require("discord-api-types/v9"); 
+const { token } = require("./config.json"); 
 const fs = require("fs"); 
-const { token, clientID, guildID } = require("./config.json"); 
+const path = require("path");
 
-const client = new Discord.Client({ intents: ['GUILDS', 'GUILD_MESSAGES'] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
-client.once("ready", () => {
-    console.log("CalendarBot is online!"); 
-});
-
-class Event {
-    constructor(title, date, time){
-        this.title = title; 
-        this.date = date;  
-        this.time = time; 
-    }
-    isEventValid() // checks that the event has been initialized in the right format (i.e date = dd/mm/yyyy)
-    {
-    
-    }
-}
-
-client.commands = new Discord.Collection(); 
-
+// command handler
+client.commands = new Collection(); 
 const commandFolders = fs.readdirSync("./commands"); 
 
-// populating client.commands collection with commands
 for (const folder of commandFolders) {
-    const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith(".js")); // fetches in js file in the commands folder
+    const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith(".js")); 
     for (const file of commandFiles) {
         const command = require(`./commands/${folder}/${file}`); 
-        client.commands.set(command.name, command);  
+        client.commands.set(command.data.name, command);  
     }
 }
 
-const rest = new REST({ version: "9" }).setToken(token); 
+// event handler         
+const eventsPath = path.join(__dirname, 'events'); 
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js')); 
 
-// registering each command within client.commands as a slash command
-(async () => {
-    try {
-        console.log("Started refreshing application (/) commands."); 
-
-        await rest.put(
-           // sub in this line when done so that command is global and can be used in all servers/guilds
-           // Routes.applicationCommands(clientID), { body: client.commands } 
-           Routes.applicationGuildCommands(clientID, guildID),
-           { body: client.commands }
-        ); 
-
-        console.log("Successfully reloaded application (/) commands."); 
-    } catch (error) {
-        console.error(error); 
-    }
-})(); 
-
-// configuring slash command responses 
-client.on("interactionCreate", async interaction => {
-    if (!interaction.isCommand()) return; 
-
-    if (interaction.commandName == "addevent") {
-        await interaction.reply({ content: "Event added to calendar!", ephemeral: true });  
-    }
-})
+for (const file of eventFiles) {
+	const filePath = path.join(eventsPath, file);
+	const event = require(filePath);
+	if (event.once) {
+		client.once(event.name, (...args) => event.execute(...args));
+	} else {
+		client.on(event.name, (...args) => event.execute(...args));
+	}
+}
 
 client.login(token); 
