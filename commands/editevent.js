@@ -2,8 +2,8 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName("deleteevent")
-        .setDescription("Delete an event from your calendar"),
+        .setName("editevent")
+        .setDescription("Edit an event in your calendar"),
     async execute(interaction) {
         // do something
         await interaction.reply('Do something'); 

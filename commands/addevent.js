@@ -3,36 +3,53 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("addevent")
-        .setDescription("Add an event to your calendar"),
-        options: [
-            {
-                name: "title",
-                description: "event title",
-                type: 3, 
-                required: true
-            },
-            {
-                name: "time", 
-                description: "event time",
-                type: 3,
-                required: true
-            },
-            {
-                name: "date",
-                description: "date of event (in dd/mm/yyyy format)",
-                type: 3,
-                required: true
-            }
-        ],
+        .setDescription("Add an event to the calendar")
+        
+        .addStringOption(option => 
+            option.setName('event')
+                .setDescription('Event name')
+                .setRequired(true))
+
+        .addStringOption(option => 
+            option.setName('start_date')
+                .setDescription('Event start date')
+                .setRequired(true))
+
+        .addStringOption(option => 
+            option.setName('end_date')
+                .setDescription('Event end date')
+                .setRequired(true))
+
+        .addStringOption(option => 
+            option.setName('start_time')
+                .setDescription('Event start time')
+                .setRequired(true))
+
+        .addStringOption(option => 
+            option.setName('end_time')
+                .setDescription('Event end time')
+                .setRequired(true))
+
+        .addStringOption(option => 
+            option.setName('event_type')
+                .setDescription('Handles for recurring events')
+                .addChoices(
+                    { name: 'Daily', value: 'daily' },
+                    { name: 'Weekly', value: 'weekly' },
+                    { name: 'Monthly', value: 'monthly' }, 
+                    { name: 'Yearly', value: 'yearly' }
+                )), 
+            
     async execute(interaction) {
-        // do something
-        if (IsTimeCorrectlyFormatted(interaction.options.getString("time")) && IsDateCorrectlyFormatted(interaction.options.getString("date"))) {
-            await interaction.reply({ content: "Event added to calendar!", ephemeral: true });  
-        } else {
-            interaction.reply({          
-                content: "Sorry, but something is wrong with your inputs! Make sure that you are using 24-hour time and that the date you entered is in the 'dd/mm/yyyy' format"
-            })
-        }
+        
+        /**
+         * Validation will be implemented when DB design is complete
+         * This is where: 
+         * - inputs will be validated
+         * - event will be added to DB
+         */
+        interaction.reply({ content: "addevent execute reached" })
+    
     }
 }
 
