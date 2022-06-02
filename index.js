@@ -9,14 +9,13 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
 // command handler
 client.commands = new Collection(); 
-const commandFolders = fs.readdirSync("./commands"); 
+const commandsPath = path.join(__dirname, 'commands'); 
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js')); 
 
-for (const folder of commandFolders) {
-    const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith(".js")); 
-    for (const file of commandFiles) {
-        const command = require(`./commands/${folder}/${file}`); 
-        client.commands.set(command.data.name, command);  
-    }
+for (const file of commandFiles) {
+	const filePath = path.join(commandsPath, file);
+	const command = require(filePath);
+	client.commands.set(command.data.name, command);
 }
 
 // event handler         

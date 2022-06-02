@@ -6,5 +6,6 @@ module.exports = {
         .setDescription("Delete an event from your calendar"),
     async execute(interaction) {
         // do something
+        await interaction.reply('Do something'); 
     }
 }
