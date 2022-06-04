@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require("@discordjs/builders"); 
+const { Events } = require('../index');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -31,15 +32,17 @@ module.exports = {
                 .setRequired(true))
 
         .addStringOption(option => 
+            option.setName('event_description')
+                .setDescription('A brief description of the event'))
+
+        .addStringOption(option => 
             option.setName('event_type')
                 .setDescription('Handles for recurring events')
-                .addChoices(
-                    { name: 'Daily', value: 'daily' },
-                    { name: 'Weekly', value: 'weekly' },
-                    { name: 'Monthly', value: 'monthly' }, 
-                    { name: 'Yearly', value: 'yearly' }
-                )), 
-            
+                .addChoice('Daily', 'daily' )
+                .addChoice('Weekly', 'weekly' )
+                .addChoice('Monthly', 'monthly' )
+                .addChoice('Yearly', 'yearly' )), 
+
     async execute(interaction) {
         
         /**
@@ -48,8 +51,37 @@ module.exports = {
          * - inputs will be validated
          * - event will be added to DB
          */
-        interaction.reply({ content: "addevent execute reached" })
-    
+        
+        const eventName = interaction.options.getString('event'); 
+        const startDate = interaction.options.getString('start_date'); 
+        const endDate = interaction.options.getString('end_date');
+        const startTime = interaction.options.getString('start_time'); 
+        const endTime = interaction.options.getString('end_time'); 
+        const eventDescription = interaction.options.getString('event_description'); 
+        const eventType = interaction.options.getString('event_type'); 
+
+        try {
+            const event = await Events.create({
+                tag: interaction.user.id,
+                event: eventName,
+                start_date: startDate,
+                end_date: endDate,
+                start_time: startTime,
+                end_time: endTime,
+                event_description: eventDescription, 
+                event_type: eventType,
+            })
+
+            return interaction.reply(`Event ${eventName} successfully added`);
+        }
+        catch (error) {
+            if (error.name === 'SequelizeUniqueConstraintError') {
+                return interaction.reply('That tag already exists'); 
+            }
+
+			return interaction.reply('Something went wrong with adding the event.');
+        }
+        
     }
 }
 

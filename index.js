@@ -14,24 +14,27 @@ const sequelize = new Sequelize('database', 'user', 'password', {
 	storage: 'database.sqlite', 
 });
 
-const Calendars = sequelize.define('events', {
+const Events = sequelize.define('events', {
 	eventID: {
 		type: Sequelize.INTEGER, 
 		primaryKey: true, 
-		autoIncrement: true
-	}, 
-	tag: {
-		type: Sequelize.STRING,
+		autoIncrement: true,
 		unique: true,
 	}, 
+	tag: Sequelize.STRING,
 	event: Sequelize.TEXT,
-	start_Date: Sequelize.DATEONLY,
-	end_Date: Sequelize.DATEONLY,
-	start_Time: Sequelize.TIME,
-	end_Time: Sequelize.TIME,
-	event_Type: Sequelize.TEXT,
+	start_date: Sequelize.DATEONLY,
+	end_date: Sequelize.DATEONLY,
+	start_time: Sequelize.TIME,
+	end_time: Sequelize.TIME,
+	event_description: Sequelize.TEXT, 
+	event_type: Sequelize.TEXT,
 	duration: Sequelize.INTEGER
 });
+
+module.exports = {
+	Events,
+}
 
 // command handler
 client.commands = new Collection(); 

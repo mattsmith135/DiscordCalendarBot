@@ -1,7 +1,7 @@
 {
   "name": "discordcalendarbot",
   "version": "1.0.0",
-  "description": "A bot that allows you to maintain a calendar within discord",
+  "description": "A bot that allows you to manage a calendar from within discord",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
