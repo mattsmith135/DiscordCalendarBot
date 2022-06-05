@@ -23,14 +23,13 @@ db.checkConnection = async function() {
         // import db models
         fs.readdirSync(path.join(__dirname, 'models')).forEach(file => {
             var model = require(path.join(__dirname, 'models', file))(sequelize);
-            console.log(model.name); 
             db[model.name] = model;  
         });
 
     });
 
     sequelize.sync({ 
-        force: true    
+          
     }).then(() => {
         console.log('Sequelize models synced!'); 
     }).catch(err => {
