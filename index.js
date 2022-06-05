@@ -1,40 +1,12 @@
 const { Collection, Client, Intents } = require("discord.js"); 
-const Sequelize = require('sequelize'); 
 const { token } = require("./config.json"); 
 const fs = require("fs"); 
 const path = require("path");
+const db = require('./database'); 
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
-const sequelize = new Sequelize('database', 'user', 'password', {
-	host: 'localhost',
-	dialect: 'sqlite', 
-	logging: false,
-	// SQLite only 
-	storage: 'database.sqlite', 
-});
-
-const Events = sequelize.define('events', {
-	eventID: {
-		type: Sequelize.INTEGER, 
-		primaryKey: true, 
-		autoIncrement: true,
-		unique: true,
-	}, 
-	tag: Sequelize.STRING,
-	event: Sequelize.TEXT,
-	start_date: Sequelize.DATEONLY,
-	end_date: Sequelize.DATEONLY,
-	start_time: Sequelize.TIME,
-	end_time: Sequelize.TIME,
-	event_description: Sequelize.TEXT, 
-	event_type: Sequelize.TEXT,
-	duration: Sequelize.INTEGER
-});
-
-module.exports = {
-	Events,
-}
+db.checkConnection(); 
 
 // command handler
 client.commands = new Collection(); 

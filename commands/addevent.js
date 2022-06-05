@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("@discordjs/builders"); 
-const { Events } = require('../index');
+const db = require('../database'); 
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -61,16 +61,18 @@ module.exports = {
         const eventType = interaction.options.getString('event_type'); 
 
         try {
-            const event = await Events.create({
+            const event = await db['event'].create({
                 tag: interaction.user.id,
                 event: eventName,
                 start_date: startDate,
                 end_date: endDate,
-                start_time: startTime,
+                start_time: startTime, 
                 end_time: endTime,
                 event_description: eventDescription, 
                 event_type: eventType,
-            })
+            }).then(res => {
+                console.log(res); 
+            }).catch(err => console.log(err)); 
 
             return interaction.reply(`Event ${eventName} successfully added`);
         }
@@ -79,7 +81,7 @@ module.exports = {
                 return interaction.reply('That tag already exists'); 
             }
 
-			return interaction.reply('Something went wrong with adding the event.');
+			return interaction.reply('Something went wrong with adding the event');
         }
         
     }

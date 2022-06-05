@@ -1,0 +1,22 @@
+const Sequelize = require('sequelize'); 
+
+module.exports = (sequelize) => {
+    const Event = sequelize.define('event', {
+        eventID: {
+            type: Sequelize.INTEGER, 
+            primaryKey: true, 
+            autoIncrement: true,
+            unique: true,
+        }, 
+        tag: Sequelize.STRING,
+        event: Sequelize.TEXT,
+        start_date: Sequelize.DATEONLY,
+        end_date: Sequelize.DATEONLY,
+        start_time: Sequelize.TIME,
+        end_time: Sequelize.TIME,
+        event_description: Sequelize.TEXT, 
+        event_type: Sequelize.TEXT,
+        duration: Sequelize.INTEGER
+    }); 
+    return Event; 
+}
