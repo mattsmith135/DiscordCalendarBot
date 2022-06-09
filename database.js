@@ -29,7 +29,7 @@ db.checkConnection = async function() {
     });
 
     sequelize.sync({ 
-          
+        // force: true
     }).then(() => {
         console.log('Sequelize models synced!'); 
     }).catch(err => {

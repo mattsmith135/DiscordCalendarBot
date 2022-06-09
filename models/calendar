@@ -1,0 +1,17 @@
+const Sequelize = require('sequelize'); 
+
+module.exports = (sequelize) => {
+    const calendar = sequelize.define('calendar', {
+        calendarID: {
+            type: Sequelize.INTEGER, 
+            primaryKey: true,
+            autoIncrement: true,
+            unique: true,
+        }, 
+        tag: Sequelize.STRING,
+        guildID: Sequelize.STRING, 
+        calendar_name: Sequelize.TEXT,
+        calendar_description: Sequelize.TEXT, 
+    }); 
+    return calendar; 
+}

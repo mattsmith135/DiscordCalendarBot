@@ -2,74 +2,57 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const db = require('../database'); 
 
 module.exports = {
-    data: new SlashCommandBuilder()
-        .setName("addevent")
-        .setDescription("Add an event to the calendar")
-        
-        .addStringOption(option => 
-            option.setName('event')
-                .setDescription('Event name')
-                .setRequired(true))
+    data: new SlashCommandBuilder() 
+            .setName('addevent')   
+            .setDescription('Create an event!')
+            .addStringOption(option => 
+                option.setName('event')
+                    .setDescription('Event name')
+                    .setRequired(true))
 
-        .addStringOption(option => 
-            option.setName('start_date')
-                .setDescription('Event start date')
-                .setRequired(true))
+            .addStringOption(option => 
+                option.setName('event_description')
+                    .setDescription('A brief description of the event')
+                    .setRequired(true))
+    
+            .addStringOption(option => 
+                option.setName('start')
+                    .setDescription('Event start [yyyy] [MM] [dd] (hh) (mm)')
+                    .setRequired(true))
+    
+            .addStringOption(option => 
+                option.setName('end')
+                    .setDescription('Event end [yyyy] [MM] [dd] (hh) (mm)')
+                    .setRequired(true))
 
-        .addStringOption(option => 
-            option.setName('end_date')
-                .setDescription('Event end date')
-                .setRequired(true))
-
-        .addStringOption(option => 
-            option.setName('start_time')
-                .setDescription('Event start time')
-                .setRequired(true))
-
-        .addStringOption(option => 
-            option.setName('end_time')
-                .setDescription('Event end time')
-                .setRequired(true))
-
-        .addStringOption(option => 
-            option.setName('event_description')
-                .setDescription('A brief description of the event'))
-
-        .addStringOption(option => 
-            option.setName('event_type')
-                .setDescription('Handles for recurring events')
-                .addChoice('Daily', 'daily' )
-                .addChoice('Weekly', 'weekly' )
-                .addChoice('Monthly', 'monthly' )
-                .addChoice('Yearly', 'yearly' )), 
-
+            .addStringOption(option =>
+                option.setName('calendar')
+                    .setDescription('Calendar the event will be added to')
+                    .setRequired(true)),
+    
     async execute(interaction) {
-        
-        /**
-         * Validation will be implemented when DB design is complete
-         * This is where: 
-         * - inputs will be validated
-         * - event will be added to DB
-         */
-        
-        const eventName = interaction.options.getString('event'); 
-        const startDate = interaction.options.getString('start_date'); 
-        const endDate = interaction.options.getString('end_date');
-        const startTime = interaction.options.getString('start_time'); 
-        const endTime = interaction.options.getString('end_time'); 
-        const eventDescription = interaction.options.getString('event_description'); 
-        const eventType = interaction.options.getString('event_type'); 
+
+        const eventName = interaction.options.getString('event');
+        const eventDescription = interaction.options.getString('description'); 
+        const eventStart = interaction.options.getString('start'); 
+        const eventEnd = interaction.options.getString('end');
+        const eventCalendar = interaction.options.getString('calendar'); 
+
+        const calendar = await db['calendar'].findOne({
+            where: {
+                calendar_name: eventCalendar
+            }
+        })
 
         try {
             const event = await db['event'].create({
+                calendarID: calendar.calendarID, 
                 tag: interaction.user.id,
-                event: eventName,
-                start_date: startDate,
-                end_date: endDate,
-                start_time: startTime, 
-                end_time: endTime,
+                guildID: interaction.guild.id, 
+                event_name: eventName,
                 event_description: eventDescription, 
-                event_type: eventType,
+                event_start: eventStart,
+                event_end: eventEnd,
             }).then(res => {
                 console.log(res); 
             }).catch(err => console.log(err)); 
@@ -81,11 +64,10 @@ module.exports = {
                 return interaction.reply('That tag already exists'); 
             }
 
-			return interaction.reply('Something went wrong with adding the event');
+            return interaction.reply(`Failed to add event, the following error occurred: ${error}`);
         }
-        
     }
-}
+} 
 
 // returns true if the passed-in time is in the 24-hour format 
 function IsTimeCorrectlyFormatted(time) {
