@@ -8,35 +8,41 @@ module.exports = {
         .setDescription("Display all calendars for your guild"),
 
     async execute(interaction) {
-        const showCalendarEmbed = new MessageEmbed()
-            .setColor('#45C2B1')
-            .setTitle(`${interaction.user.username} | Calendar`)
-            .setDescription('This is an embed listing all of the calendars for your guild')
-            .setTimestamp()
-            .setFooter(interaction.user.tag, interaction.user.displayAvatarURL()); 
 
-        const guildCalendars = await db['calendar'].findAll({
-            where: {
-                guildID: interaction.guild.id
-            }
-        })
+        try {
+            const displayCalendarsEmbed = new MessageEmbed()
+                .setColor('#45C2B1')
+                .setTitle(`${interaction.guild.name} | Calendars`)
+                .setDescription('This is an embed listing all of the calendars for your guild')
+                .setTimestamp()
+                .setFooter(interaction.user.tag, interaction.user.displayAvatarURL()); 
 
-        // creating table display within embed
+            const guildCalendars = await db['calendar'].findAll({
+                where: {
+                    guildID: interaction.guild.id
+                }
+            })
 
-        let calendarIDs = []; 
-        let calendarNames = []; 
+            // creating table display within embed
 
-        guildCalendars.forEach(entry => {
-            calendarIDs.push(entry.dataValues.calendarID.toString()); 
-            calendarNames.push(entry.dataValues.calendar_name.toString()); 
-        })
+            let calendarIDs = []; 
+            let calendarNames = []; 
 
-        let calendarIDsStringed = calendarIDs.join('\n');
-        let calendarNamesStringed = calendarNames.join('\n'); 
+            guildCalendars.forEach(entry => {
+                calendarIDs.push(entry.dataValues.calendarID.toString()); 
+                calendarNames.push(entry.dataValues.calendar_name.toString()); 
+            })
+
+            let calendarIDsStringed = calendarIDs.join('\n');
+            let calendarNamesStringed = calendarNames.join('\n'); 
+            
+            displayCalendarsEmbed.addField('Calendar ID', calendarIDsStringed, true); 
+            displayCalendarsEmbed.addField('Calendar', calendarNamesStringed, true); 
+
+            await interaction.reply({ embeds: [displayCalendarsEmbed] }); 
+        } catch(error) {
+            return interaction.reply(`Failed to display calendars, the following error occurred: ${error}`);
+        }
         
-        showCalendarEmbed.addField('Calendar ID', calendarIDsStringed, true); 
-        showCalendarEmbed.addField('Calendar', calendarNamesStringed, true); 
-
-        await interaction.reply({ embeds: [showCalendarEmbed] }); 
     }
 }

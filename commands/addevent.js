@@ -27,7 +27,7 @@ module.exports = {
 
             .addStringOption(option =>
                 option.setName('calendar')
-                    .setDescription('Calendar the event will be added to')
+                    .setDescription('Name of calendar the event will be added to')
                     .setRequired(true)),
     
     async execute(interaction) {
@@ -59,7 +59,7 @@ module.exports = {
 
             return interaction.reply(`Event ${eventName} successfully added`);
         }
-        catch (error) {
+        catch(error) {
             if (error.name === 'SequelizeUniqueConstraintError') {
                 return interaction.reply('That tag already exists'); 
             }
